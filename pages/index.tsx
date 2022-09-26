@@ -14,53 +14,69 @@ const {
   NEXT_PUBLIC_PETFINDER_CLIENT_SECRET,
 } = process.env;
 
+const mapAnimalTypesData = async (types: AnimalType[]) => {
+  return await Promise.all(
+    types.map(async (type) => {
+      const { blurhash, img } = await getPlaiceholder(
+        ANIMAL_TYPES[type.name].image.url
+      );
+
+      return {
+        ...type,
+        id: type._links.self.href.match(/\/types\/([\w-]+)$/)[1],
+        blurhash,
+        img: {
+          src: img.src,
+          objectPosition:
+            ANIMAL_TYPES[type.name].image.styles?.objectPosition ||
+            "center",
+        },
+      };
+    })
+  );
+}
+
+const getAuth = async () => {
+  const url = `${NEXT_PUBLIC_PETFINDER_API_URL}/oauth2/token`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      grant_type: "client_credentials",
+      client_id: NEXT_PUBLIC_PETFINDER_CLIENT_ID,
+      client_secret: NEXT_PUBLIC_PETFINDER_CLIENT_SECRET,
+    }),
+  };
+
+  return await (
+    await fetch(url, options)
+  ).json()
+}
+
+const getAnimalTypes = async (accessToken: string) => {
+  const url = `${NEXT_PUBLIC_PETFINDER_API_URL}/types`;
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
+
+  return await (
+    await fetch(url, options)
+  ).json();
+}
+
 export const getStaticProps: GetStaticProps = async () => {
   let types = [];
 
   try {
-    const { access_token } = await (
-      await fetch(`${NEXT_PUBLIC_PETFINDER_API_URL}/oauth2/token`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({
-          grant_type: "client_credentials",
-          client_id: NEXT_PUBLIC_PETFINDER_CLIENT_ID,
-          client_secret: NEXT_PUBLIC_PETFINDER_CLIENT_SECRET,
-        }),
-      })
-    ).json();
-
-    ({ types } = await (
-      await fetch(`${NEXT_PUBLIC_PETFINDER_API_URL}/types`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-    ).json());
-
+    const { access_token } = await getAuth();
+    ({ types } = await getAnimalTypes(access_token));
     if (types.length > 0) {
-      types = await Promise.all(
-        types.map(async (type) => {
-          const { blurhash, img } = await getPlaiceholder(
-            ANIMAL_TYPES[type.name].image.url
-          );
-
-          return {
-            ...type,
-            id: type._links.self.href.match(/\/types\/([\w-]+)$/)[1],
-            blurhash,
-            img: {
-              src: img.src,
-              objectPosition:
-                ANIMAL_TYPES[type.name].image.styles?.objectPosition ||
-                "center",
-            },
-          };
-        })
-      );
+      types = await mapAnimalTypesData(types);
     }
   } catch (err) {
     console.error(err);
