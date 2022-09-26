@@ -3,6 +3,8 @@ import {
   Animal,
   AnimalType,
 } from "../../shared/interfaces/petfinder.interface";
+
+import Breadcrumbs from "../../components/Breadcrumbs";
 import AnimalCardsList from "../../components/AnimalCardsList";
 
 export interface TypePageProps {
@@ -117,29 +119,43 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 const TypePage: NextPage<TypePageProps> = ({ animals, type }) => (
-  <main>
-    <section className="relative mb-7" id="overview">
-      <h1 className="text-7xl font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
-        {type.name}
-      </h1>
-      <p className="mt-7 text-2xl text-gray-400">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
-      </p>
-    </section>
-    <section className="relative mb-7" id="recently-adopted">
-      <h3 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-7">
-        Recently Adopted
-      </h3>
-      <AnimalCardsList animals={animals} />
-    </section>
-  </main>
+  <>
+    <Breadcrumbs
+      className="mb-7"
+      pages={[
+        {
+          name: "Types",
+          url: `/`, // Should be /types, which will be implemented at a later time.
+        },
+        {
+          name: type.name,
+          url: `/types/${type.id}`,
+        },
+      ]}
+    />
+    <main>
+      <section className="relative mb-7" id="overview">
+        <h1 className="text-7xl font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
+          {type.name}
+        </h1>
+        <p className="mt-7 text-2xl text-gray-400">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </section>
+      <section className="relative mb-7" id="recently-adopted">
+        <h3 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-7">
+          Recently Adopted
+        </h3>
+        <AnimalCardsList animals={animals} />
+      </section>
+    </main>
+  </>
 );
-  
-  export default TypePage;
-  
+
+export default TypePage;
