@@ -5,9 +5,15 @@ const { withPlaiceholder } = require("@plaiceholder/next");
  */
 const config = {
   reactStrictMode: true,
+  staticPageGenerationTimeout: 120,
   experimental: { externalDir: true, images: { allowFutureImage: true } },
   images: {
-    domains: ["images.unsplash.com"],
+    domains: [
+      "images.unsplash.com",
+      "via.placeholder.com",
+      "photos.petfinder.com",
+      "dl5zpyw5k3jeb.cloudfront.net",
+    ],
   },
 };
 
